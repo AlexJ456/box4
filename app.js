@@ -165,14 +165,3 @@ document.getElementById("resetButton").addEventListener("click", resetApp);
 document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
 document.getElementById("shortcut5min").addEventListener("click", () => startShortcutSession(5));
 document.getElementById("shortcut10min").addEventListener("click", () => startShortcutSession(10));
-
-// Add CSS to change button text color to warm yellow
-document.addEventListener('DOMContentLoaded', function() {
-  const style = document.createElement('style');
-  style.textContent = `
-    button {
-      color: #FFDD77 !important;
-    }
-  `;
-  document.head.appendChild(style);
-});
