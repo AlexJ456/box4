@@ -53,22 +53,23 @@ function releaseWakeLock() {
 
 // Begin the breathing cycle. Each phase lasts 4 seconds.
 function nextPhase() {
-  // Retrieve the time limit (in seconds) from the input.
+  // Retrieve the time limit (in minutes) from the input and convert to seconds.
   const timeLimitInput = document.getElementById('timeLimit').value;
-  const timeLimitSec = timeLimitInput && !isNaN(timeLimitInput) ? parseInt(timeLimitInput, 10) : 0;
+  const timeLimitSec = timeLimitInput && !isNaN(timeLimitInput) ? parseInt(timeLimitInput, 10) * 60 : 0;
 
   // If a time limit is set and exceeded, only end if the current phase is Exhale.
   if (timeLimitSec && totalSeconds >= timeLimitSec && steps[stepIndex] === "Exhale") {
     isPlaying = false;
     document.getElementById('instruction').textContent = "Complete!";
     document.getElementById('startButton').textContent = "Start";
-    // Hide the countdown once complete.
     document.getElementById('countdown').textContent = "";
     releaseWakeLock();
+    // Remove active session styling
+    document.body.classList.remove('session-active');
     return;
   }
 
-  // Display the current phase.
+  // Update the instruction for the current phase.
   document.getElementById('instruction').textContent = steps[stepIndex];
 
   // Start the 4-second countdown for the current phase.
@@ -84,11 +85,9 @@ function nextPhase() {
       clearInterval(intervalId);
       totalSeconds++;
       updateTimeDisplay();
-      // Play tone if enabled.
       if (document.getElementById('soundToggle').checked) {
         playTone();
       }
-      // Move to the next phase.
       stepIndex = (stepIndex + 1) % steps.length;
       nextPhase();
     } else {
@@ -113,9 +112,11 @@ function togglePlay() {
     // Hide controls and shortcut buttons while the session is ongoing.
     document.getElementById('controls').style.display = "none";
     document.getElementById('shortcuts').style.display = "none";
+    // Add active session class to activate style changes.
+    document.body.classList.add('session-active');
     // Request wake lock so the display does not turn off.
     requestWakeLock();
-    // Start the breathing cycle; the countdown now appears.
+    // Start the breathing cycle.
     nextPhase();
   } else {
     // Pause the session.
@@ -123,6 +124,8 @@ function togglePlay() {
     document.getElementById('startButton').textContent = "Start";
     document.getElementById('instruction').textContent = "Paused";
     releaseWakeLock();
+    // Remove active session styling.
+    document.body.classList.remove('session-active');
   }
 }
 
@@ -139,11 +142,13 @@ function resetApp() {
   document.getElementById('controls').style.display = "block";
   document.getElementById('shortcuts').style.display = "block";
   releaseWakeLock();
+  // Remove active session styling.
+  document.body.classList.remove('session-active');
 }
 
 // Start a session with a predefined time limit (in minutes).
 function startShortcutSession(minutes) {
-  document.getElementById('timeLimit').value = minutes * 60;
+  document.getElementById('timeLimit').value = minutes;
   if (!isPlaying) {
     togglePlay();
   }
