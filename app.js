@@ -2,7 +2,7 @@
 let isPlaying = false;
 let totalSeconds = 0;
 let stepIndex = 0;
-let timeLimitReached = false; // New flag to indicate that the time limit has been reached
+let timeLimitReached = false; // Flag to indicate if the time limit has been reached
 
 const steps = ["Inhale", "Hold", "Exhale", "Wait"];
 
@@ -48,50 +48,49 @@ function nextPhase() {
   document.getElementById("countdown").textContent = countdown;
 
   const intervalId = setInterval(() => {
-    countdown_timer(countdown, intervalId);
-  }, 1000);
-}
-
-function countdown_timer(countdown, intervalId) {
-  if (!isPlaying) {
-    clearInterval(intervalId);
-    return;
-  }
-  if (countdown <= 1) {
-    clearInterval(intervalId);
-    // Play tone if enabled
-    if (document.getElementById("soundToggle").checked) {
-      playTone();
+    if (!isPlaying) {
+      clearInterval(intervalId); // Stop countdown if paused or stopped
+      return;
     }
-    totalSeconds += countdown;
-    updateTimeDisplay();
 
-    if (timeLimitReached) {
-      // If time limit reached but the current phase is not "Exhale", skip ahead until Exhale is reached
-      if (steps[stepIndex] !== "Exhale") {
-        do {
-          stepIndex = (stepIndex + 1) % steps.length;
-        } while (steps[stepIndex] !== "Exhale");
-        nextPhase();
+    if (countdown <= 1) {
+      clearInterval(intervalId);
+
+      // Play tone if enabled
+      if (document.getElementById("soundToggle").checked) {
+        playTone();
+      }
+
+      totalSeconds += countdown;
+      updateTimeDisplay();
+
+      if (timeLimitReached) {
+        // If time limit reached but current phase is not "Exhale", skip ahead until Exhale is reached
+        if (steps[stepIndex] !== "Exhale") {
+          do {
+            stepIndex = (stepIndex + 1) % steps.length;
+          } while (steps[stepIndex] !== "Exhale");
+          nextPhase();
+        } else {
+          // If in Exhale phase and time limit reached, finish the session and hide the countdown timer
+          isPlaying = false;
+          document.getElementById("instruction").textContent = "Complete!";
+          document.getElementById("startButton").textContent = "Start";
+          document.getElementById("countdown").textContent = "";
+          timeLimitReached = false; // Reset the flag for a potential restart
+        }
       } else {
-        // If in Exhale phase and time limit reached, finish the session and hide the countdown timer
-        isPlaying = false;
-        document.getElementById("instruction").textContent = "Complete!";
-        document.getElementById("startButton").textContent = "Start";
-        document.getElementById("countdown").textContent = "";
-        timeLimitReached = false; // Reset the flag for a potential restart
+        // Normal cycle: move to the next phase and continue the session
+        stepIndex = (stepIndex + 1) % steps.length;
+        nextPhase();
       }
     } else {
-      // Normal cycle: move to the next phase and continue the session
-      stepIndex = (stepIndex + 1) % steps.length;
-      nextPhase();
+      countdown--;
+      document.getElementById("countdown").textContent = countdown;
+      totalSeconds++;
+      updateTimeDisplay();
     }
-  } else {
-    countdown--;
-    document.getElementById("countdown").textContent = countdown;
-    totalSeconds++;
-    updateTimeDisplay();
-  }
+  }, 1000);
 }
 
 // Toggle between start and pause actions.
@@ -119,9 +118,9 @@ function resetApp() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
-  timeLimitReached = false;
+  timeLimitReached = false; // Reset flag on reset
   document.getElementById("instruction").textContent = "Press Start to Begin";
-  document.getElementById("countdown").textContent = 4;
+  document.getElementById("countdown").textContent = "4";
   document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
 }
