@@ -58,11 +58,7 @@ function nextPhase() {
       completeSession();
       return;
     }
-    // If we're in any other phase, continue until we reach the next exhale
-    else if (totalSeconds > timeLimitSec + 16) { // Safety check to prevent infinite loops
-      completeSession();
-      return;
-    }
+    // Removed safety check to allow natural progression to next exhale
   }
   
   // Display the current breathing phase.
