@@ -51,10 +51,18 @@ function nextPhase() {
       ? parseInt(timeLimitInput, 10) * 60
       : 0;
   
-  // Check if time limit is reached and we're in or have completed the Exhale phase
-  if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[stepIndex] === "Exhale") {
-    completeSession();
-    return;
+  // If a time limit is set and reached, check if we need to complete the session
+  if (timeLimitSec && totalSeconds >= timeLimitSec) {
+    // If we're in the exhale phase, end now
+    if (steps[stepIndex] === "Exhale") {
+      completeSession();
+      return;
+    }
+    // If we're in another phase, allow a safety margin to complete before forcing session end
+    else if (totalSeconds > timeLimitSec + 16) {
+      completeSession();
+      return;
+    }
   }
   
   // Display the current breathing phase.
@@ -74,36 +82,22 @@ function nextPhase() {
       if (document.getElementById("soundToggle").checked) {
         playTone();
       }
-      totalSeconds += countdown; // add remaining seconds
+      totalSeconds += countdown; // Add any remaining seconds.
       updateTimeDisplay();
       // Move to the next phase.
       stepIndex = (stepIndex + 1) % steps.length;
-      
-      // Check if time limit is reached and the next phase would be after Exhale
-      if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[(stepIndex - 1 + steps.length) % steps.length] === "Exhale") {
-        completeSession();
-        return;
-      }
-      
       nextPhase();
     } else {
       countdown--;
       document.getElementById("countdown").textContent = countdown;
       totalSeconds++;
       updateTimeDisplay();
-      
-      // Check if time limit is reached during countdown and we're in Exhale phase
-      if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[stepIndex] === "Exhale" && countdown === 0) {
-        clearInterval(intervalId);
-        completeSession();
-        return;
-      }
     }
   }, 1000);
 }
 
 /**
- * Complete the breathing session
+ * Complete the breathing session.
  */
 function completeSession() {
   isPlaying = false;
@@ -117,7 +111,6 @@ function completeSession() {
  */
 function togglePlay() {
   if (!isPlaying) {
-    // Start the breathing session.
     isPlaying = true;
     totalSeconds = 0;
     stepIndex = 0;
@@ -125,60 +118,39 @@ function togglePlay() {
     document.getElementById("instruction").textContent = "Starting...";
     document.getElementById("countdown").style.display = "none";
     updateTimeDisplay();
-    // Hide the controls (sound and time limit) and shortcut buttons when the session starts.
-    document.getElementById("controls").style.display = "none";
-    document.getElementById("shortcuts").style.display = "none";
-    // Prevent screen from sleeping
     preventSleep();
     nextPhase();
   } else {
-    // Pause the session.
     isPlaying = false;
     document.getElementById("startButton").textContent = "Start";
-    document.getElementById("instruction").textContent = "Paused";
   }
 }
 
 /**
- * Reset the app to its initial state.
+ * Reset the session.
  */
-function resetApp() {
+function resetSession() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
+  updateTimeDisplay();
   document.getElementById("instruction").textContent = "Press Start to Begin";
   document.getElementById("countdown").style.display = "none";
-  document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
-  // Show the controls and shortcut buttons again when the app resets.
-  document.getElementById("controls").style.display = "block";
-  document.getElementById("shortcuts").style.display = "block";
 }
 
-/**
- * Start a session with a predefined time limit.
- */
-function startShortcutSession(minutes) {
-  document.getElementById("timeLimit").value = minutes; // Set the time limit.
-  if (!isPlaying) {
-    togglePlay(); // Start the session.
-  }
-}
-
-// Bind event listeners to the main and shortcut buttons.
+// Event listeners for control and shortcut buttons.
 document.getElementById("startButton").addEventListener("click", togglePlay);
-document.getElementById("resetButton").addEventListener("click", resetApp);
-document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
-document.getElementById("shortcut5min").addEventListener("click", () => startShortcutSession(5));
-document.getElementById("shortcut10min").addEventListener("click", () => startShortcutSession(10));
-
-// Add CSS to change button text color to warm yellow
-document.addEventListener('DOMContentLoaded', function() {
-  const style = document.createElement('style');
-  style.textContent = `
-    button {
-      color: #FFDD77 !important;
-    }
-  `;
-  document.head.appendChild(style);
+document.getElementById("resetButton").addEventListener("click", resetSession);
+document.getElementById("shortcut2min").addEventListener("click", () => {
+  document.getElementById("timeLimit").value = 2;
+  togglePlay();
+});
+document.getElementById("shortcut5min").addEventListener("click", () => {
+  document.getElementById("timeLimit").value = 5;
+  togglePlay();
+});
+document.getElementById("shortcut10min").addEventListener("click", () => {
+  document.getElementById("timeLimit").value = 10;
+  togglePlay();
 });
