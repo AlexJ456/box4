@@ -1,3 +1,4 @@
+/* General body styling */
 body {
   background-color: black;
   color: #ffbf00;
@@ -10,6 +11,7 @@ body {
   margin: 0;
   text-align: center;
   padding: 20px;
+  overflow: hidden; /* Prevent scrolling */
 }
 
 .title {
@@ -39,9 +41,10 @@ body {
   margin: 5px;
 }
 
-.control-button:hover {
+/* Shortcut buttons */
+.shortcut-button {
 }
 
-/* Shortcut buttons */
-#shortcuts {
-margin-top auto;}
+/* Prevent zooming on input fields for iOS */
+.no-zoom {
+font
