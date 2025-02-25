@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Disable zoom on iOS -->
+  <!-- Disable zooming on iOS -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Box Breathing App</title>
   <!-- PWA manifest and iOS meta tags -->
@@ -20,7 +20,7 @@
     </div>
     <h1 class="title">Box Breathing</h1>
     <div id="controls">
-      <!-- Sound checkbox positioned above time limit -->
+      <!-- Sound checkbox positioned above the time limit input -->
       <label>
         <input type="checkbox" id="soundToggle"> Sound
       </label>
@@ -30,7 +30,7 @@
       </label>
     </div>
     <div id="instruction" class="instruction">Press Start to Begin</div>
-    <!-- Countdown hidden until session begins -->
+    <!-- Countdown is kept empty until the session starts -->
     <div id="countdown" class="countdown"></div>
     <!-- Control Buttons -->
     <button id="startButton" class="control-button">Start</button>
@@ -44,7 +44,7 @@
   </div>
   <!-- Load our app script -->
   <script src="app.js" defer></script>
-  <!-- Service worker registration -->
+  <!-- Service worker registration keeps the app working offline -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
