@@ -36,12 +36,25 @@ function nextPhase() {
 
     // If a time limit is set and reached, complete the session.
     if (timeLimitSec > 0 && totalSeconds >= timeLimitSec) {
-        // If we're not in the Exhale phase, continue until we complete the next exhale
-        if (stepIndex !== 2) { // 2 is the index of "Exhale"
+        // If we're in the Exhale phase, complete the session
+        if (stepIndex === 2) { // 2 is the index of "Exhale"
+            isPlaying = false;
+            document.getElementById('instruction').textContent = "Complete!";
+            document.getElementById('countdown').style.display = 'none';
+            document.getElementById('startButton').textContent = "Start";
+            // Show the controls and shortcut buttons again
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('shortcuts').style.display = 'block';
+            // Reset title position
+            document.querySelector('.title').classList.remove('title-up');
+            document.querySelector('.instruction').classList.remove('instruction-large');
+            document.querySelector('.countdown').classList.remove('countdown-large');
+            return;
+        } else {
+            // If not in Exhale phase, continue until we reach the end of the next Exhale
             document.getElementById('instruction').textContent = steps[stepIndex];
             let countdown = 4;
             document.getElementById('countdown').textContent = countdown;
-            document.getElementById('countdown').style.color = '#FF6347';
             
             const intervalId = setInterval(() => {
                 if (!isPlaying) {
@@ -57,34 +70,17 @@ function nextPhase() {
                         playTone();
                     }
                     
-                    totalSeconds += countdown;
+                    totalSeconds++;
                     updateTimeDisplay();
                     
                     // Move to the next phase.
                     stepIndex = (stepIndex + 1) % steps.length;
                     
-                    // If we've reached the end of Exhale, complete the session
-                    if (stepIndex === 3) { // 3 is the index after "Exhale"
-                        isPlaying = false;
-                        document.getElementById('instruction').textContent = "Complete!";
-                        document.getElementById('instruction').style.color = '#FF6347';
-                        document.getElementById('countdown').style.display = 'none';
-                        document.getElementById('startButton').textContent = "Start";
-                        // Show the controls and shortcut buttons again
-                        document.getElementById('controls').style.display = 'block';
-                        document.getElementById('shortcuts').style.display = 'block';
-                        // Keep screen on
-                        if (navigator.wakeLock) {
-                            try {
-                                wakeLock.release();
-                                wakeLock = null;
-                            } catch (err) {
-                                console.error(`${err.name}, ${err.message}`);
-                            }
-                        }
-                        return;
+                    // If we've reached Exhale, we need to complete that phase before ending
+                    if (stepIndex === 2) { // 2 is the index of "Exhale"
+                        nextPhase(); // Start the Exhale phase
                     } else {
-                        nextPhase();
+                        nextPhase(); // Continue to next phase
                     }
                 } else {
                     countdown--;
@@ -93,82 +89,42 @@ function nextPhase() {
                     updateTimeDisplay();
                 }
             }, 1000);
-        } else {
-            // We're already in the Exhale phase, so complete normally
-            isPlaying = false;
-            document.getElementById('instruction').textContent = "Complete!";
-            document.getElementById('instruction').style.color = '#FF6347';
-            document.getElementById('countdown').style.display = 'none';
-            document.getElementById('startButton').textContent = "Start";
-            // Show the controls and shortcut buttons again
-            document.getElementById('controls').style.display = 'block';
-            document.getElementById('shortcuts').style.display = 'block';
-            // Release screen wake lock
-            if (navigator.wakeLock) {
-                try {
-                    wakeLock.release();
-                    wakeLock = null;
-                } catch (err) {
-                    console.error(`${err.name}, ${err.message}`);
-                }
-            }
-            return;
         }
-    }
-
-    // Display the current breathing phase.
-    document.getElementById('instruction').textContent = steps[stepIndex];
-    document.getElementById('instruction').style.color = '#FF6347';
-    
-    let countdown = 4;
-    document.getElementById('countdown').textContent = countdown;
-    document.getElementById('countdown').style.color = '#FF6347';
-    document.getElementById('countdown').style.display = 'block';
-    
-    const intervalId = setInterval(() => {
-        if (!isPlaying) {
-            clearInterval(intervalId);
-            return;
-        }
+    } else {
+        // Display the current breathing phase.
+        document.getElementById('instruction').textContent = steps[stepIndex];
         
-        if (countdown <= 1) {
-            clearInterval(intervalId);
-            
-            // Play tone if enabled.
-            if (document.getElementById('soundToggle').checked) {
-                playTone();
+        let countdown = 4;
+        document.getElementById('countdown').textContent = countdown;
+        document.getElementById('countdown').style.display = 'block';
+        
+        const intervalId = setInterval(() => {
+            if (!isPlaying) {
+                clearInterval(intervalId);
+                return;
             }
             
-            totalSeconds++;
-            updateTimeDisplay();
-            
-            // Move to the next phase.
-            stepIndex = (stepIndex + 1) % steps.length;
-            nextPhase();
-        } else {
-            countdown--;
-            document.getElementById('countdown').textContent = countdown;
-            totalSeconds++;
-            updateTimeDisplay();
-        }
-    }, 1000);
-}
-
-// Variable to store wake lock
-let wakeLock = null;
-
-// Request wake lock to prevent screen from turning off
-async function requestWakeLock() {
-    if ('wakeLock' in navigator) {
-        try {
-            wakeLock = await navigator.wakeLock.request('screen');
-            wakeLock.addEventListener('release', () => {
-                console.log('Wake Lock was released');
-            });
-            console.log('Wake Lock is active');
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
-        }
+            if (countdown <= 1) {
+                clearInterval(intervalId);
+                
+                // Play tone if enabled.
+                if (document.getElementById('soundToggle').checked) {
+                    playTone();
+                }
+                
+                totalSeconds++;
+                updateTimeDisplay();
+                
+                // Move to the next phase.
+                stepIndex = (stepIndex + 1) % steps.length;
+                nextPhase();
+            } else {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+                totalSeconds++;
+                updateTimeDisplay();
+            }
+        }, 1000);
     }
 }
 
@@ -181,15 +137,16 @@ function togglePlay() {
         stepIndex = 0;
         document.getElementById('startButton').textContent = "Pause";
         document.getElementById('instruction').textContent = "Starting...";
-        document.getElementById('instruction').style.color = '#FF6347';
         updateTimeDisplay();
         
         // Hide the controls (sound and time limit) and shortcut buttons when the session starts.
         document.getElementById('controls').style.display = 'none';
         document.getElementById('shortcuts').style.display = 'none';
         
-        // Request wake lock to prevent screen from turning off
-        requestWakeLock();
+        // Move title up and make countdown/instruction larger
+        document.querySelector('.title').classList.add('title-up');
+        document.querySelector('.instruction').classList.add('instruction-large');
+        document.querySelector('.countdown').classList.add('countdown-large');
         
         nextPhase();
     } else {
@@ -197,16 +154,6 @@ function togglePlay() {
         isPlaying = false;
         document.getElementById('startButton').textContent = "Start";
         document.getElementById('instruction').textContent = "Paused";
-        
-        // Release wake lock when paused
-        if (wakeLock) {
-            try {
-                wakeLock.release();
-                wakeLock = null;
-            } catch (err) {
-                console.error(`${err.name}, ${err.message}`);
-            }
-        }
     }
 }
 
@@ -216,26 +163,18 @@ function resetApp() {
     totalSeconds = 0;
     stepIndex = 0;
     document.getElementById('instruction').textContent = "Press Start to Begin";
-    document.getElementById('instruction').style.color = '';
-    document.getElementById('countdown').textContent = "4";
-    document.getElementById('countdown').style.color = '';
-    document.getElementById('countdown').style.display = 'block';
+    document.getElementById('countdown').style.display = 'none'; // Hide countdown on reset
     document.getElementById('timeDisplay').textContent = "00:00";
     document.getElementById('startButton').textContent = "Start";
+    
+    // Reset title position and text sizes
+    document.querySelector('.title').classList.remove('title-up');
+    document.querySelector('.instruction').classList.remove('instruction-large');
+    document.querySelector('.countdown').classList.remove('countdown-large');
     
     // Show the controls and shortcut buttons again when the app resets.
     document.getElementById('controls').style.display = 'block';
     document.getElementById('shortcuts').style.display = 'block';
-    
-    // Release wake lock when reset
-    if (wakeLock) {
-        try {
-            wakeLock.release();
-            wakeLock = null;
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
-        }
-    }
 }
 
 // Start a session with a predefined time limit.
@@ -253,3 +192,8 @@ document.getElementById('resetButton').addEventListener('click', resetApp);
 document.getElementById('shortcut2min').addEventListener('click', () => startShortcutSession(2));
 document.getElementById('shortcut5min').addEventListener('click', () => startShortcutSession(5));
 document.getElementById('shortcut10min').addEventListener('click', () => startShortcutSession(10));
+
+// Hide countdown on initial load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('countdown').style.display = 'none';
+});
