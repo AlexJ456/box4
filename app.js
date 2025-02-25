@@ -2,7 +2,9 @@
 let isPlaying = false;
 let totalSeconds = 0;
 let stepIndex = 0;
+let sessionEndPending = false;
 const steps = ["Inhale", "Hold", "Exhale", "Wait"];
+let wakeLock = null;
 
 /**
  * Update the displayed total time.
@@ -33,22 +35,56 @@ function playTone() {
 }
 
 /**
- * Begin the breathing cycle. Each phase lasts 4 seconds.
+ * Request a wake lock to keep the display active.
+ */
+async function requestWakeLock() {
+  try {
+    if ("wakeLock" in navigator) {
+      wakeLock = await navigator.wakeLock.request("screen");
+    }
+  } catch (err) {
+    console.error("Wake lock request failed:", err);
+  }
+}
+
+/**
+ * Release the wake lock.
+ */
+function releaseWakeLock() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => {
+      wakeLock = null;
+    });
+  }
+}
+
+/**
+ * Handle the breathing cycle phases.
  */
 function nextPhase() {
-  // Get the optional time limit (in seconds).
+  // Make sure the countdown is visible when the session is active.
+  document.getElementById("countdown").style.display = "block";
+  
+  // Retrieve the optional time limit (in seconds)
   const timeLimitInput = document.getElementById("timeLimit").value;
   const timeLimitSec =
     timeLimitInput !== "" && !isNaN(timeLimitInput)
       ? parseInt(timeLimitInput, 10) * 60
       : 0;
   
-  // If a time limit is set and reached, complete the session.
+  // If a time limit is set and reached, only end the session on Exhale.
   if (timeLimitSec && totalSeconds >= timeLimitSec) {
-    isPlaying = false;
-    document.getElementById("instruction").textContent = "Complete!";
-    document.getElementById("startButton").textContent = "Start";
-    return;
+    if (steps[stepIndex] !== "Exhale") {
+      sessionEndPending = true;
+    } else {
+      isPlaying = false;
+      document.getElementById("instruction").textContent = "Complete!";
+      document.getElementById("startButton").textContent = "Start";
+      document.getElementById("countdown").style.display = "none";
+      releaseWakeLock();
+      sessionEndPending = false;
+      return;
+    }
   }
   
   // Display the current breathing phase.
@@ -67,8 +103,20 @@ function nextPhase() {
       if (document.getElementById("soundToggle").checked) {
         playTone();
       }
-      totalSeconds += countdown; // add remaining seconds
+      totalSeconds += countdown;
       updateTimeDisplay();
+      
+      // End the session on Exhale if flagged.
+      if (sessionEndPending && steps[stepIndex] === "Exhale") {
+         isPlaying = false;
+         document.getElementById("instruction").textContent = "Complete!";
+         document.getElementById("startButton").textContent = "Start";
+         document.getElementById("countdown").style.display = "none";
+         releaseWakeLock();
+         sessionEndPending = false;
+         return;
+      }
+      
       // Move to the next phase.
       stepIndex = (stepIndex + 1) % steps.length;
       nextPhase();
@@ -82,26 +130,28 @@ function nextPhase() {
 }
 
 /**
- * Toggle between start and pause actions.
+ * Toggle the start/pause state of the session.
  */
 function togglePlay() {
   if (!isPlaying) {
-    // Start the breathing session.
     isPlaying = true;
     totalSeconds = 0;
     stepIndex = 0;
+    sessionEndPending = false;
     document.getElementById("startButton").textContent = "Pause";
     document.getElementById("instruction").textContent = "Starting...";
     updateTimeDisplay();
-    // Hide the controls (sound and time limit) and shortcut buttons when the session starts.
+    // Hide controls and shortcut buttons on session start.
     document.getElementById("controls").style.display = "none";
     document.getElementById("shortcuts").style.display = "none";
+    document.getElementById("countdown").style.display = "block";
+    requestWakeLock();
     nextPhase();
   } else {
-    // Pause the session.
     isPlaying = false;
     document.getElementById("startButton").textContent = "Start";
     document.getElementById("instruction").textContent = "Paused";
+    releaseWakeLock();
   }
 }
 
@@ -112,26 +162,28 @@ function resetApp() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
+  sessionEndPending = false;
   document.getElementById("instruction").textContent = "Press Start to Begin";
   document.getElementById("countdown").textContent = "4";
   document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
-  // Show the controls and shortcut buttons again when the app resets.
+  // Show controls and shortcuts after resetting.
   document.getElementById("controls").style.display = "block";
   document.getElementById("shortcuts").style.display = "block";
+  document.getElementById("countdown").style.display = "none";
+  releaseWakeLock();
 }
 
 /**
- * Start a session with a predefined time limit.
+ * Start a session with a preset time limit.
  */
 function startShortcutSession(minutes) {
-  document.getElementById("timeLimit").value = minutes; // Set the time limit.
+  document.getElementById("timeLimit").value = minutes;
   if (!isPlaying) {
-    togglePlay(); // Start the session.
+    togglePlay();
   }
 }
 
-// Bind event listeners to the main and shortcut buttons.
 document.getElementById("startButton").addEventListener("click", togglePlay);
 document.getElementById("resetButton").addEventListener("click", resetApp);
 document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
