@@ -1,3 +1,4 @@
+/* General styling */
 body {
   background-color: black;
   color: #ffbf00;
@@ -21,4 +22,31 @@ body {
 
 .info {
   position: absolute;
-  top:
+  top: 20px;
+  right: 20px;
+}
+
+/* Phase instruction and countdown in warm red */
+.instruction,
+.countdown {
+  font-size: 1.5rem;
+  color: #ff4500;
+}
+
+/* Control buttons styled in a dark theme */
+.control-button,
+.shortcut-button {
+  background-color: #333;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+/* Hide default appearance on the number input for iOS */
+.no-zoom {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
