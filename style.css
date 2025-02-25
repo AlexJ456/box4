@@ -1,90 +1,18 @@
-/* General body styling */
-body {
-    background-color: black;
-    color: #ffbf00;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-    text-align: center;
-    padding: 20px;
-    overflow: hidden; /* Prevent scrolling */
+/* Title positioning during session */
+.title-up {
+    margin-top: -20px;
+    margin-bottom: 10px;
+    transition: margin 0.3s ease;
 }
 
-.title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #ffd700;
+/* Larger instruction text during session */
+.instruction-large {
+    font-size: 2rem;
+    transition: font-size 0.3s ease;
 }
 
-.info {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.instruction {
-    font-size: 1.5rem;
-}
-
-.countdown {
-    font-size: 4rem;
-    color: #FF6347; /* Warmer red (tomato) */
-}
-
-/* Control buttons */
-.control-button {
-    font-size: 1rem;
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #333;
-    color: #ffbf00;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Shortcut buttons */
-.shortcut-button {
-    font-size: 1rem;
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #333;
-    color: #ffbf00;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Prevent zooming on input fields for iOS */
-.no-zoom {
-    font-size: 16px; /* Minimum font size to prevent auto-zoom */
-    touch-action: manipulation;
-}
-
-/* Style for input elements and labels */
-input[type="number"], input[type="checkbox"] {
-    background-color: #333;
-    color: #ffbf00;
-    border: 1px solid #555;
-    padding: 5px;
-    border-radius: 3px;
-}
-
-label {
-    margin: 10px 0;
-    display: block;
-}
-
-/* Controls container */
-#controls {
-    margin-bottom: 20px;
-}
-
-/* Shortcuts container */
-#shortcuts {
-    margin-top: 20px;
+/* Larger countdown during session */
+.countdown-large {
+    font-size: 5rem;
+    transition: font-size 0.3s ease;
 }
