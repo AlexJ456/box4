@@ -2,7 +2,6 @@
 let isPlaying = false;
 let totalSeconds = 0;
 let stepIndex = 0;
-let timeLimitReached = false; // Not used explicitly now but can be extended later if needed
 const steps = ["Inhale", "Hold", "Exhale", "Wait"];
 
 /**
@@ -15,7 +14,7 @@ function updateTimeDisplay() {
 }
 
 /**
- * Play a brief tone (100ms beep at 440Hz) via the Web Audio API.
+ * Play a brief tone (100ms beep at 440Hz) using the Web Audio API.
  */
 function playTone() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -37,22 +36,22 @@ function playTone() {
  * Begin the breathing cycle. Each phase lasts 4 seconds.
  */
 function nextPhase() {
-  // Get time limit from the input field (in seconds)
+  // Get the optional time limit (in seconds).
   const timeLimitInput = document.getElementById("timeLimit").value;
   const timeLimitSec =
     timeLimitInput !== "" && !isNaN(timeLimitInput)
       ? parseInt(timeLimitInput, 10) * 60
       : 0;
-
-  // If a time limit is set and exceeded, complete the session
+  
+  // If a time limit is set and reached, complete the session.
   if (timeLimitSec && totalSeconds >= timeLimitSec) {
     isPlaying = false;
     document.getElementById("instruction").textContent = "Complete!";
     document.getElementById("startButton").textContent = "Start";
     return;
   }
-
-  // Display the current breathing phase
+  
+  // Display the current breathing phase.
   document.getElementById("instruction").textContent = steps[stepIndex];
   let countdown = 4;
   document.getElementById("countdown").textContent = countdown;
@@ -64,13 +63,13 @@ function nextPhase() {
     }
     if (countdown <= 1) {
       clearInterval(intervalId);
-      // Play tone if the sound toggle is on
+      // Play tone if enabled.
       if (document.getElementById("soundToggle").checked) {
         playTone();
       }
-      totalSeconds += countdown;
+      totalSeconds += countdown; // add remaining seconds
       updateTimeDisplay();
-      // Move to the next phase
+      // Move to the next phase.
       stepIndex = (stepIndex + 1) % steps.length;
       nextPhase();
     } else {
@@ -87,18 +86,19 @@ function nextPhase() {
  */
 function togglePlay() {
   if (!isPlaying) {
-    // Start the breathing session
+    // Start the breathing session.
     isPlaying = true;
     totalSeconds = 0;
     stepIndex = 0;
     document.getElementById("startButton").textContent = "Pause";
     document.getElementById("instruction").textContent = "Starting...";
     updateTimeDisplay();
-    // Hide the shortcut buttons when the session starts
+    // Hide the controls (sound and time limit) and shortcut buttons when the session starts.
+    document.getElementById("controls").style.display = "none";
     document.getElementById("shortcuts").style.display = "none";
     nextPhase();
   } else {
-    // Pause the session
+    // Pause the session.
     isPlaying = false;
     document.getElementById("startButton").textContent = "Start";
     document.getElementById("instruction").textContent = "Paused";
@@ -112,12 +112,12 @@ function resetApp() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
-  timeLimitReached = false;
   document.getElementById("instruction").textContent = "Press Start to Begin";
   document.getElementById("countdown").textContent = "4";
   document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
-  // Show the shortcut buttons again when the app is reset
+  // Show the controls and shortcut buttons again when the app resets.
+  document.getElementById("controls").style.display = "block";
   document.getElementById("shortcuts").style.display = "block";
 }
 
@@ -125,13 +125,13 @@ function resetApp() {
  * Start a session with a predefined time limit.
  */
 function startShortcutSession(minutes) {
-  document.getElementById("timeLimit").value = minutes;
+  document.getElementById("timeLimit").value = minutes; // Set the time limit.
   if (!isPlaying) {
-    togglePlay();
+    togglePlay(); // Start the session.
   }
 }
 
-// Bind event listeners for main and shortcut buttons.
+// Bind event listeners to the main and shortcut buttons.
 document.getElementById("startButton").addEventListener("click", togglePlay);
 document.getElementById("resetButton").addEventListener("click", resetApp);
 document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
