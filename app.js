@@ -2,25 +2,27 @@
 let isPlaying = false;
 let totalSeconds = 0;
 let stepIndex = 0;
-let timeLimitReached = false; // Flag to indicate if the time limit has been reached
-
 const steps = ["Inhale", "Hold", "Exhale", "Wait"];
 
-// Update the displayed total time
+/**
+ * Update the total time display.
+ */
 function updateTimeDisplay() {
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
   document.getElementById("timeDisplay").textContent = `${minutes}:${seconds}`;
 }
 
-// Play a brief tone (100ms beep at 440Hz) using the Web Audio API
+/**
+ * Plays a brief tone (100ms beep at 440Hz) using the Web Audio API.
+ */
 function playTone() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (AudioContext) {
     const context = new AudioContext();
     const oscillator = context.createOscillator();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = 440; // A4 440Hz
+    oscillator.type = "sine";
+    oscillator.frequency.value = 440; // A4 (440 Hz)
     oscillator.connect(context.destination);
     oscillator.start();
     setTimeout(() => {
@@ -30,16 +32,21 @@ function playTone() {
   }
 }
 
-// Begin the breathing cycle; each phase lasts 4 seconds.
+/**
+ * Begin the breathing cycle. Each phase lasts 4 seconds.
+ */
 function nextPhase() {
+  // Check for optional time limit
   const timeLimitInput = document.getElementById("timeLimit").value;
-  const timeLimitSec = timeLimitInput && !isNaN(timeLimitInput)
-    ? parseInt(timeLimitInput, 10) * 60
-    : 0;
-
-  // Check if the time limit has been reached and set the flag without immediately ending the session
+  const timeLimitSec =
+    timeLimitInput !== "" && !isNaN(timeLimitInput)
+      ? parseInt(timeLimitInput, 10) * 60
+      : 0;
   if (timeLimitSec && totalSeconds >= timeLimitSec) {
-    timeLimitReached = true;
+    isPlaying = false;
+    document.getElementById("instruction").textContent = "Complete!";
+    document.getElementById("startButton").textContent = "Start";
+    return;
   }
 
   // Display the current phase
@@ -48,42 +55,22 @@ function nextPhase() {
   document.getElementById("countdown").textContent = countdown;
 
   const intervalId = setInterval(() => {
+    // If the session is paused, stop the countdown
     if (!isPlaying) {
-      clearInterval(intervalId); // Stop countdown if paused or stopped
+      clearInterval(intervalId);
       return;
     }
-
+    // When countdown reaches 1, end this phase
     if (countdown <= 1) {
       clearInterval(intervalId);
-
       // Play tone if enabled
       if (document.getElementById("soundToggle").checked) {
         playTone();
       }
-
-      totalSeconds += countdown;
+      totalSeconds += countdown; // add remaining seconds
       updateTimeDisplay();
-
-      if (timeLimitReached) {
-        // If time limit reached but current phase is not "Exhale", skip ahead until Exhale is reached
-        if (steps[stepIndex] !== "Exhale") {
-          do {
-            stepIndex = (stepIndex + 1) % steps.length;
-          } while (steps[stepIndex] !== "Exhale");
-          nextPhase();
-        } else {
-          // If in Exhale phase and time limit reached, finish the session and hide the countdown timer
-          isPlaying = false;
-          document.getElementById("instruction").textContent = "Complete!";
-          document.getElementById("startButton").textContent = "Start";
-          document.getElementById("countdown").textContent = "";
-          timeLimitReached = false; // Reset the flag for a potential restart
-        }
-      } else {
-        // Normal cycle: move to the next phase and continue the session
-        stepIndex = (stepIndex + 1) % steps.length;
-        nextPhase();
-      }
+      stepIndex = (stepIndex + 1) % steps.length; // move to next phase
+      nextPhase();
     } else {
       countdown--;
       document.getElementById("countdown").textContent = countdown;
@@ -93,38 +80,55 @@ function nextPhase() {
   }, 1000);
 }
 
-// Toggle between start and pause actions.
+/**
+ * Toggle between start and pause.
+ */
 function togglePlay() {
   if (!isPlaying) {
-    // Start the breathing session.
+    // Start the breathing session
     isPlaying = true;
     totalSeconds = 0;
     stepIndex = 0;
-    timeLimitReached = false;
     document.getElementById("startButton").textContent = "Pause";
     document.getElementById("instruction").textContent = "Starting...";
     updateTimeDisplay();
     nextPhase();
   } else {
-    // Pause the session.
+    // Pause the session
     isPlaying = false;
     document.getElementById("startButton").textContent = "Start";
     document.getElementById("instruction").textContent = "Paused";
   }
 }
 
-// Reset the app to its initial state.
+/**
+ * Resets the app to its initial state.
+ */
 function resetApp() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
-  timeLimitReached = false; // Reset flag on reset
   document.getElementById("instruction").textContent = "Press Start to Begin";
   document.getElementById("countdown").textContent = "4";
   document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
 }
 
-// Bind event listeners to the buttons.
+/**
+ * Start a session with a predefined time limit.
+ */
+function startShortcutSession(minutes) {
+  document.getElementById("timeLimit").value = minutes; // Set time limit
+  if (!isPlaying) {
+    togglePlay(); // Start the session
+  }
+}
+
+// Bind event listeners to the buttons
 document.getElementById("startButton").addEventListener("click", togglePlay);
 document.getElementById("resetButton").addEventListener("click", resetApp);
+
+// Bind event listeners for shortcut buttons
+document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
+document.getElementById("shortcut5min").addEventListener("click", () => startShortcutSession(5));
+document.getElementById("shortcut10min").addEventListener("click", () => startShortcutSession(10));
