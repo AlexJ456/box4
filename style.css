@@ -1,90 +1,52 @@
-/* General body styling */
+/* General styling */
 body {
-    background-color: black;
-    color: #ffbf00;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-    text-align: center;
-    padding: 20px;
-    overflow: hidden; /* Prevent scrolling */
+  background-color: black;
+  color: #ffbf00;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden; /* Prevents scrolling */
 }
 
 .title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #ffd700;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #ffd700;
 }
 
 .info {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
-.instruction {
-    font-size: 1.5rem;
-}
-
+/* Phase instruction and countdown in warm red */
+.instruction,
 .countdown {
-    font-size: 4rem;
-    color: #FF6347; /* Warmer red (tomato) */
+  font-size: 1.5rem;
+  color: #ff4500;
 }
 
-/* Control buttons */
-.control-button {
-    font-size: 1rem;
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #333;
-    color: #ffbf00;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Shortcut buttons */
+/* Control buttons styled in a dark theme */
+.control-button,
 .shortcut-button {
-    font-size: 1rem;
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #333;
-    color: #ffbf00;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  background-color: #333;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
 }
 
-/* Prevent zooming on input fields for iOS */
+/* Hide default appearance on the number input for iOS */
 .no-zoom {
-    font-size: 16px; /* Minimum font size to prevent auto-zoom */
-    touch-action: manipulation;
-}
-
-/* Style for input elements and labels */
-input[type="number"], input[type="checkbox"] {
-    background-color: #333;
-    color: #ffbf00;
-    border: 1px solid #555;
-    padding: 5px;
-    border-radius: 3px;
-}
-
-label {
-    margin: 10px 0;
-    display: block;
-}
-
-/* Controls container */
-#controls {
-    margin-bottom: 20px;
-}
-
-/* Shortcuts container */
-#shortcuts {
-    margin-top: 20px;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
 }
