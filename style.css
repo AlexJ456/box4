@@ -1,4 +1,3 @@
-/* General body styling */
 body {
   background-color: black;
   color: #ffbf00;
@@ -11,7 +10,7 @@ body {
   margin: 0;
   text-align: center;
   padding: 20px;
-  overflow: hidden; /* Prevent scrolling */
+  overflow: hidden; /* Prevents scrolling */
 }
 
 .title {
@@ -22,29 +21,4 @@ body {
 
 .info {
   position: absolute;
-  top: 20px;
-  right: 20px;
-}
-
-.instruction {
-  font-size: 1.5rem;
-}
-
-.countdown {
-  font-size: 4rem;
-}
-
-/* Control buttons */
-.control-button {
-  font-size: 1rem;
-  padding: 10px 20px;
-  margin: 5px;
-}
-
-/* Shortcut buttons */
-.shortcut-button {
-}
-
-/* Prevent zooming on input fields for iOS */
-.no-zoom {
-font
+  top:
