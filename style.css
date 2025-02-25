@@ -1,4 +1,4 @@
-/* Global body styling */
+/* General body styling */
 body {
   background-color: black;
   color: #ffbf00;
@@ -11,7 +11,7 @@ body {
   margin: 0;
   text-align: center;
   padding: 20px;
-  overflow: hidden;
+  overflow: hidden; /* Prevent scrolling */
   touch-action: manipulation;
   -webkit-overflow-scrolling: none;
 }
@@ -22,24 +22,20 @@ html, body {
   overflow: hidden;
 }
 
-/* Title styling */
 .title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   color: #ffd700;
 }
 
-/* Info positioning */
 .info {
   position: absolute;
   top: 20px;
   right: 20px;
 }
 
-/* Instruction and countdown styling */
-.instruction,
-.countdown {
-  color: #ff6347;
+.instruction, #countdown {
+  color: #ff6347; /* Warm red color */
 }
 
 .instruction {
@@ -55,7 +51,6 @@ html, body {
   font-size: 1rem;
   padding: 10px 20px;
   margin: 5px;
-  color: #ffd700; /* Warm yellow text for control buttons */
 }
 
 /* Shortcut buttons */
@@ -63,16 +58,20 @@ html, body {
   font-size: 1rem;
   padding: 10px 20px;
   margin: 5px;
-  color: #ffd700; /* Warm yellow text for shortcut buttons */
 }
 
 /* Prevent zooming on input fields for iOS */
 .no-zoom {
-  font-size: 16px;
+  font-size: 16px; /* Prevents zoom on focus in iOS */
 }
 
 /* Dark button styling */
 .dark-button {
   background-color: #333;
-  color: #ffd700; /* Applying warm yellow text to dark buttons */
+  color: white;
+}
+
+/* Disable user scaling/zooming */
+input[type="number"] {
+  font-size: 16px; /* Prevents zoom on focus in iOS */
 }
