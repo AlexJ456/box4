@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <title>Box Breathing App</title>
     <!-- PWA manifest and iOS meta tags -->
     <link rel="manifest" href="manifest.json" />
@@ -11,6 +11,23 @@
     <link rel="apple-touch-icon" href="icon-192.png" />
     <!-- Custom styling -->
     <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Darken all buttons */
+      .control-button,
+      .shortcut-button {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      /* Set warm red color for countdown and instruction text */
+      .countdown,
+      .instruction {
+        color: #FF4500;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -19,7 +36,7 @@
       </div>
       <h1 class="title">Box Breathing</h1>
       <div id="controls">
-        <!-- Sound checkbox -->
+        <!-- Sound checkbox (positioned above time limit) -->
         <label>
           <input type="checkbox" id="soundToggle" /> Sound
         </label>
@@ -30,11 +47,11 @@
         </label>
       </div>
       <div id="instruction" class="instruction">Press Start to Begin</div>
-      <div id="countdown" class="countdown">4</div>
+      <!-- Countdown initially hidden -->
+      <div id="countdown" class="countdown" style="display: none;">4</div>
       <!-- Control Buttons -->
       <button id="startButton" class="control-button">Start</button>
       <button id="resetButton" class="control-button">Reset</button>
-
       <!-- Shortcut Buttons -->
       <div id="shortcuts">
         <button id="shortcut2min" class="shortcut-button">2 Min Session</button>
