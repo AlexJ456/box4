@@ -43,25 +43,8 @@ body {
 
 /* Shortcut buttons */
 .shortcut-button {
-  /* Add additional styling if needed */
 }
 
 /* Prevent zooming on input fields for iOS */
 .no-zoom {
-  -webkit-appearance: none;
-  -moz-appearance: textfield;
-}
-
-/* ===== ACTIVE SESSION STYLES ===== */
-/* When the exercise has started, a class is added to the body */
-.session-active .title {
-  transform: translateY(-20px); /* Moves the title up a bit */
-}
-
-.session-active .instruction {
-  font-size: 2.5rem; /* Larger instruction text */
-}
-
-.session-active .countdown {
-  font-size: 5rem; /* Larger countdown text */
-}
+font
