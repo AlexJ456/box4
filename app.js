@@ -51,18 +51,10 @@ function nextPhase() {
       ? parseInt(timeLimitInput, 10) * 60
       : 0;
   
-  // If a time limit is set and reached, check if we need to complete the session
-  if (timeLimitSec && totalSeconds >= timeLimitSec) {
-    // If we're in the exhale phase, end now
-    if (steps[stepIndex] === "Exhale") {
-      completeSession();
-      return;
-    }
-    // If we're in any other phase, continue until we reach the next exhale
-    else if (totalSeconds > timeLimitSec + 16) { // Safety check to prevent infinite loops
-      completeSession();
-      return;
-    }
+  // Check if time limit is reached and we're in or have completed the Exhale phase
+  if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[stepIndex] === "Exhale") {
+    completeSession();
+    return;
   }
   
   // Display the current breathing phase.
@@ -86,12 +78,26 @@ function nextPhase() {
       updateTimeDisplay();
       // Move to the next phase.
       stepIndex = (stepIndex + 1) % steps.length;
+      
+      // Check if time limit is reached and the next phase would be after Exhale
+      if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[(stepIndex - 1 + steps.length) % steps.length] === "Exhale") {
+        completeSession();
+        return;
+      }
+      
       nextPhase();
     } else {
       countdown--;
       document.getElementById("countdown").textContent = countdown;
       totalSeconds++;
       updateTimeDisplay();
+      
+      // Check if time limit is reached during countdown and we're in Exhale phase
+      if (timeLimitSec > 0 && totalSeconds >= timeLimitSec && steps[stepIndex] === "Exhale" && countdown === 0) {
+        clearInterval(intervalId);
+        completeSession();
+        return;
+      }
     }
   }, 1000);
 }
