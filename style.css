@@ -22,39 +22,15 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  color: #FFA500;
 }
 
 .instruction {
   font-size: 1.5rem;
-  margin: 20px 0;
-  color: #FF8500;
 }
 
 .countdown {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  color: #FF4500;
-}
+ font-size :4 rem }
 
-.control-button {
-  font-size: 1rem;
-  padding: 10px 20px;
-  margin: 5px;
-  background-color: #FFA500;
-  border: none;
-  cursor: pointer;
-}
-
-.control-button:hover {
-  background-color: #FF8C00;
-}
-
-#controls {
-  margin-bottom: 20px;
-}
-
-/* Prevent zooming on input fields on iOS */
-.no-zoom {
-  font-size: 16px;
-}
+/* Shortcut buttons */
+#shortcuts{
+marginTop
