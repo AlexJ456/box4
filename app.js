@@ -2,10 +2,11 @@
 let isPlaying = false;
 let totalSeconds = 0;
 let stepIndex = 0;
+let timeLimitReached = false; // Not used explicitly now but can be extended later if needed
 const steps = ["Inhale", "Hold", "Exhale", "Wait"];
 
 /**
- * Update the total time display.
+ * Update the displayed total time.
  */
 function updateTimeDisplay() {
   const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -14,7 +15,7 @@ function updateTimeDisplay() {
 }
 
 /**
- * Plays a brief tone (100ms beep at 440Hz) using the Web Audio API.
+ * Play a brief tone (100ms beep at 440Hz) via the Web Audio API.
  */
 function playTone() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -22,7 +23,7 @@ function playTone() {
     const context = new AudioContext();
     const oscillator = context.createOscillator();
     oscillator.type = "sine";
-    oscillator.frequency.value = 440; // A4 (440 Hz)
+    oscillator.frequency.value = 440; // A4 440Hz
     oscillator.connect(context.destination);
     oscillator.start();
     setTimeout(() => {
@@ -36,12 +37,14 @@ function playTone() {
  * Begin the breathing cycle. Each phase lasts 4 seconds.
  */
 function nextPhase() {
-  // Check for optional time limit
+  // Get time limit from the input field (in seconds)
   const timeLimitInput = document.getElementById("timeLimit").value;
   const timeLimitSec =
     timeLimitInput !== "" && !isNaN(timeLimitInput)
       ? parseInt(timeLimitInput, 10) * 60
       : 0;
+
+  // If a time limit is set and exceeded, complete the session
   if (timeLimitSec && totalSeconds >= timeLimitSec) {
     isPlaying = false;
     document.getElementById("instruction").textContent = "Complete!";
@@ -49,27 +52,26 @@ function nextPhase() {
     return;
   }
 
-  // Display the current phase
+  // Display the current breathing phase
   document.getElementById("instruction").textContent = steps[stepIndex];
   let countdown = 4;
   document.getElementById("countdown").textContent = countdown;
 
   const intervalId = setInterval(() => {
-    // If the session is paused, stop the countdown
     if (!isPlaying) {
       clearInterval(intervalId);
       return;
     }
-    // When countdown reaches 1, end this phase
     if (countdown <= 1) {
       clearInterval(intervalId);
-      // Play tone if enabled
+      // Play tone if the sound toggle is on
       if (document.getElementById("soundToggle").checked) {
         playTone();
       }
-      totalSeconds += countdown; // add remaining seconds
+      totalSeconds += countdown;
       updateTimeDisplay();
-      stepIndex = (stepIndex + 1) % steps.length; // move to next phase
+      // Move to the next phase
+      stepIndex = (stepIndex + 1) % steps.length;
       nextPhase();
     } else {
       countdown--;
@@ -81,7 +83,7 @@ function nextPhase() {
 }
 
 /**
- * Toggle between start and pause.
+ * Toggle between start and pause actions.
  */
 function togglePlay() {
   if (!isPlaying) {
@@ -92,6 +94,8 @@ function togglePlay() {
     document.getElementById("startButton").textContent = "Pause";
     document.getElementById("instruction").textContent = "Starting...";
     updateTimeDisplay();
+    // Hide the shortcut buttons when the session starts
+    document.getElementById("shortcuts").style.display = "none";
     nextPhase();
   } else {
     // Pause the session
@@ -102,33 +106,34 @@ function togglePlay() {
 }
 
 /**
- * Resets the app to its initial state.
+ * Reset the app to its initial state.
  */
 function resetApp() {
   isPlaying = false;
   totalSeconds = 0;
   stepIndex = 0;
+  timeLimitReached = false;
   document.getElementById("instruction").textContent = "Press Start to Begin";
   document.getElementById("countdown").textContent = "4";
   document.getElementById("timeDisplay").textContent = "00:00";
   document.getElementById("startButton").textContent = "Start";
+  // Show the shortcut buttons again when the app is reset
+  document.getElementById("shortcuts").style.display = "block";
 }
 
 /**
  * Start a session with a predefined time limit.
  */
 function startShortcutSession(minutes) {
-  document.getElementById("timeLimit").value = minutes; // Set time limit
+  document.getElementById("timeLimit").value = minutes;
   if (!isPlaying) {
-    togglePlay(); // Start the session
+    togglePlay();
   }
 }
 
-// Bind event listeners to the buttons
+// Bind event listeners for main and shortcut buttons.
 document.getElementById("startButton").addEventListener("click", togglePlay);
 document.getElementById("resetButton").addEventListener("click", resetApp);
-
-// Bind event listeners for shortcut buttons
 document.getElementById("shortcut2min").addEventListener("click", () => startShortcutSession(2));
 document.getElementById("shortcut5min").addEventListener("click", () => startShortcutSession(5));
 document.getElementById("shortcut10min").addEventListener("click", () => startShortcutSession(10));
