@@ -41,7 +41,7 @@ function nextPhase() {
             document.getElementById('instruction').textContent = steps[stepIndex];
             let countdown = 4;
             document.getElementById('countdown').textContent = countdown;
-            document.getElementById('countdown').style.color = 'red';
+            document.getElementById('countdown').style.color = '#FF6347';
             
             const intervalId = setInterval(() => {
                 if (!isPlaying) {
@@ -67,7 +67,7 @@ function nextPhase() {
                     if (stepIndex === 3) { // 3 is the index after "Exhale"
                         isPlaying = false;
                         document.getElementById('instruction').textContent = "Complete!";
-                        document.getElementById('instruction').style.color = 'red';
+                        document.getElementById('instruction').style.color = '#FF6347';
                         document.getElementById('countdown').style.display = 'none';
                         document.getElementById('startButton').textContent = "Start";
                         // Show the controls and shortcut buttons again
@@ -97,7 +97,7 @@ function nextPhase() {
             // We're already in the Exhale phase, so complete normally
             isPlaying = false;
             document.getElementById('instruction').textContent = "Complete!";
-            document.getElementById('instruction').style.color = 'red';
+            document.getElementById('instruction').style.color = '#FF6347';
             document.getElementById('countdown').style.display = 'none';
             document.getElementById('startButton').textContent = "Start";
             // Show the controls and shortcut buttons again
@@ -118,11 +118,11 @@ function nextPhase() {
 
     // Display the current breathing phase.
     document.getElementById('instruction').textContent = steps[stepIndex];
-    document.getElementById('instruction').style.color = 'red';
+    document.getElementById('instruction').style.color = '#FF6347';
     
     let countdown = 4;
     document.getElementById('countdown').textContent = countdown;
-    document.getElementById('countdown').style.color = 'red';
+    document.getElementById('countdown').style.color = '#FF6347';
     document.getElementById('countdown').style.display = 'block';
     
     const intervalId = setInterval(() => {
@@ -181,7 +181,7 @@ function togglePlay() {
         stepIndex = 0;
         document.getElementById('startButton').textContent = "Pause";
         document.getElementById('instruction').textContent = "Starting...";
-        document.getElementById('instruction').style.color = 'red';
+        document.getElementById('instruction').style.color = '#FF6347';
         updateTimeDisplay();
         
         // Hide the controls (sound and time limit) and shortcut buttons when the session starts.
