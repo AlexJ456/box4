@@ -68,7 +68,16 @@ html, body {
 /* Dark button styling */
 .dark-button {
   background-color: #333;
-  color: white;
+  color: #ffd700;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.dark-button:hover {
+  background-color: #444;
+  transform: translateY(-2px);
 }
 
 /* Disable user scaling/zooming */
